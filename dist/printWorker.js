@@ -56,7 +56,7 @@ const path_1 = __importDefault(require("path"));
 const os_1 = require("os");
 const execAsync = (0, util_1.promisify)(child_process_1.exec);
 const QUEUE_NAME = process.env.QUEUE_NAME || "print_jobs";
-const PRINTER_NAME = "Vithsuthra";
+const PRINTER_NAME = "vithsuthra";
 // Optional: Placeholder for print status check
 function getPrintStatus(jobId, type) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -67,13 +67,14 @@ function getPrintStatus(jobId, type) {
 // 🖨️ Central print logic
 function printFile(filePath, options) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log(options.pageRange);
         return new Promise((resolve, reject) => {
             const flags = [
                 `-d ${PRINTER_NAME}`,
                 `-n ${options.copies}`,
                 `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
                 `-o sides=${options.duplex === 'double' ? 'two-sided-long-edge' : 'one-sided'}`,
-                options.PageRange ? `-P ${options.PageRange}` : ''
+                options.pageRange ? `-P ${options.pageRange}` : ''
             ].filter(Boolean).join(' ');
             const command = `lp ${flags} "${filePath}"`;
             console.log(" Sending command:", command);
@@ -104,7 +105,7 @@ function printFile(filePath, options) {
         });
     });
 }
-// 🧠 Worker loop
+//  Worker loop
 function startWorker() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("🔧 Print agent started. Waiting for jobs...");
@@ -116,8 +117,9 @@ function startWorker() {
                     continue;
                 }
                 const job = JSON.parse(jobRaw);
+                console.log(jobRaw);
                 const filename = path_1.default.join((0, os_1.tmpdir)(), `print-${Date.now()}.pdf`);
-                // 📥 Download file
+                //  Download file
                 const response = yield axios_1.default.get(job.fileUrl, { responseType: "stream" });
                 const writer = (0, fs_1.createWriteStream)(filename);
                 yield new Promise((resolve, reject) => {
@@ -125,7 +127,7 @@ function startWorker() {
                     writer.on("finish", resolve);
                     writer.on("error", reject);
                 });
-                // 🖨️ Send to printer
+                //  Send to printer
                 const status = yield printFile(filename, job.options);
                 console.log(" Job finished with status:", status);
             }

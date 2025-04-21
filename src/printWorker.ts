@@ -9,14 +9,14 @@ import { Readable } from "stream";
 
 const execAsync = promisify(exec);
 const QUEUE_NAME = process.env.QUEUE_NAME || "print_jobs";
-const PRINTER_NAME = "Vithsuthra";
+const PRINTER_NAME = "vithsuthra";
 
 interface PrintOptions {
   copies: number;
   colorMode: string;
   duplex: string;
   paperSize: string;
-  PageRange?: string;
+  pageRange: string;
   status?: string; // optional for tracking
 }
 
@@ -33,13 +33,14 @@ async function getPrintStatus(jobId: string, type?: string): Promise<string> {
 
 // 🖨️ Central print logic
 export async function printFile(filePath: string, options: PrintOptions): Promise<string> {
+  console.log(options.pageRange)
   return new Promise((resolve, reject) => {
     const flags = [
       `-d ${PRINTER_NAME}`,
       `-n ${options.copies}`,
       `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
       `-o sides=${options.duplex === 'double' ? 'two-sided-long-edge' : 'one-sided'}`,
-      options.PageRange ? `-P ${options.PageRange}` : ''
+      options.pageRange ? `-P ${options.pageRange}` : ''
     ].filter(Boolean).join(' ');
 
     const command = `lp ${flags} "${filePath}"`;
@@ -72,7 +73,7 @@ export async function printFile(filePath: string, options: PrintOptions): Promis
   });
 }
 
-// 🧠 Worker loop
+//  Worker loop
 export async function startWorker() {
   console.log("🔧 Print agent started. Waiting for jobs...");
 
@@ -85,9 +86,10 @@ export async function startWorker() {
       }
 
       const job: PrintJob = JSON.parse(jobRaw);
+      console.log(jobRaw)
       const filename = path.join(tmpdir(), `print-${Date.now()}.pdf`);
 
-      // 📥 Download file
+      //  Download file
       const response = await axios.get(job.fileUrl, { responseType: "stream" });
       const writer = createWriteStream(filename);
 
@@ -97,7 +99,7 @@ export async function startWorker() {
         writer.on("error", reject);
       });
 
-      // 🖨️ Send to printer
+      //  Send to printer
       const status = await printFile(filename, job.options);
       console.log(" Job finished with status:", status);
 
