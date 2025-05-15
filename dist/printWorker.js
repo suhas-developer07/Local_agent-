@@ -54,9 +54,10 @@ const child_process_1 = require("child_process");
 const util_1 = require("util");
 const path_1 = __importDefault(require("path"));
 const os_1 = require("os");
+const Document_orientation_1 = __importDefault(require("./Document_orientation"));
 const execAsync = (0, util_1.promisify)(child_process_1.exec);
 const QUEUE_NAME = process.env.QUEUE_NAME || "print_jobs";
-const PRINTER_NAME = "vithsuthra";
+const PRINTER_NAME = "Main_block";
 // Optional: Placeholder for print status check
 function getPrintStatus(jobId, type) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -67,14 +68,23 @@ function getPrintStatus(jobId, type) {
 // 🖨️ Central print logic
 function printFile(filePath, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(options.pageRange);
+        const orientation = yield (0, Document_orientation_1.default)(filePath);
         return new Promise((resolve, reject) => {
+            const duplexOption = options.duplex === 'double'
+                ? orientation === 'landscape'
+                    ? 'two-sided-short-edge'
+                    : 'two-sided-long-edge'
+                : 'one-sided';
+            console.log("Duplex option:", duplexOption);
             const flags = [
                 `-d ${PRINTER_NAME}`,
                 `-n ${options.copies}`,
                 `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
-                `-o sides=${options.duplex === 'double' ? 'two-sided-long-edge' : 'one-sided'}`,
-                options.pageRange ? `-P ${options.pageRange}` : ''
+                `-o sides=${duplexOption}`,
+                options.pageRange ? `-P ${options.pageRange}` : '',
+                ['1', '2', '4'].includes(options.paperSize)
+                    ? `-o number-up=${options.paperSize}`
+                    : ''
             ].filter(Boolean).join(' ');
             const command = `lp ${flags} "${filePath}"`;
             console.log(" Sending command:", command);

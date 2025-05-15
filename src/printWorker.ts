@@ -1,15 +1,16 @@
 import redis from "./redisClient";
-import axios from "axios";
+import axios, { get } from "axios";
 import fs, { createWriteStream } from "fs";
 import { exec } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import { tmpdir } from "os";
 import { Readable } from "stream";
+import getPDFOrientation from "./Document_orientation";
 
 const execAsync = promisify(exec);
 const QUEUE_NAME = process.env.QUEUE_NAME || "print_jobs";
-const PRINTER_NAME = "vithsuthra";
+const PRINTER_NAME = "Main_block";
 
 interface PrintOptions {
   copies: number;
@@ -33,14 +34,24 @@ async function getPrintStatus(jobId: string, type?: string): Promise<string> {
 
 // 🖨️ Central print logic
 export async function printFile(filePath: string, options: PrintOptions): Promise<string> {
-  console.log(options.pageRange)
+ const orientation =  await getPDFOrientation(filePath);
   return new Promise((resolve, reject) => {
+    const duplexOption = 
+        options.duplex === 'double'
+        ? orientation  === 'landscape'
+        ? 'two-sided-short-edge'
+        : 'two-sided-long-edge'
+        : 'one-sided';
+    console.log("Duplex option:", duplexOption);
     const flags = [
       `-d ${PRINTER_NAME}`,
       `-n ${options.copies}`,
       `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
-      `-o sides=${options.duplex === 'double' ? 'two-sided-long-edge' : 'one-sided'}`,
-      options.pageRange ? `-P ${options.pageRange}` : ''
+      `-o sides=${duplexOption}`,
+      options.pageRange ? `-P ${options.pageRange}` : '',
+      ['1', '2', '4'].includes(options.paperSize)
+      ? `-o number-up=${options.paperSize}`
+      : ''
     ].filter(Boolean).join(' ');
 
     const command = `lp ${flags} "${filePath}"`;
