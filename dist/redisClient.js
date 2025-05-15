@@ -7,10 +7,10 @@ const ioredis_1 = __importDefault(require("ioredis"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const redis = new ioredis_1.default({
-    host: "redis-17725.c301.ap-south-1-1.ec2.redns.redis-cloud.com",
-    port: 17725,
-    username: 'default',
-    password: 'iFFzDwfmPX9hdEs5MhGVbofXb5jAnlot',
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+    username: process.env.REDIS_USERNAME,
+    password: process.env.REDIS_PASSWORD,
     tls: undefined // Explicitly disable TLS
 });
 redis.on("connect", () => {

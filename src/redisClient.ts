@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const redis = new Redis({
-    host: "redis-17725.c301.ap-south-1-1.ec2.redns.redis-cloud.com",
-    port: 17725,
-    username: 'default',
-    password: 'iFFzDwfmPX9hdEs5MhGVbofXb5jAnlot',
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT) ,
+    username: process.env.REDIS_USERNAME,
+    password: process.env.REDIS_PASSWORD,
     tls: undefined // Explicitly disable TLS
   });
 redis.on("connect", ()=>{

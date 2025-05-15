@@ -1,1 +1,1 @@
-{"root":["./src/Document_orientation.ts","./src/WindowsPrinter.ts","./src/index.ts","./src/printWorker.ts","./src/redisClient.ts"],"version":"5.8.2"}
+{"root":["./src/Document_orientation.ts","./src/WindowsPrinter.ts","./src/index.ts","./src/printWorker.ts","./src/redisClient.ts"],"version":"5.8.3"}
