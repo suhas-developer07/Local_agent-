@@ -10,7 +10,8 @@ import getPDFOrientation from "./Document_orientation";
 
 const execAsync = promisify(exec);
 const QUEUE_NAME = process.env.QUEUE_NAME || "print_jobs";
-const PRINTER_NAME = "Main_block";
+const Color_printer = "Main_block";
+const BlackAndWhite_printer = "Black_And_White";
 
 interface PrintOptions {
   copies: number;
@@ -44,7 +45,7 @@ export async function printFile(filePath: string, options: PrintOptions): Promis
         : 'one-sided';
     console.log("Duplex option:", duplexOption);
     const flags = [
-      `-d ${PRINTER_NAME}`,
+      `-d ${options.colorMode==='color'?Color_printer:BlackAndWhite_printer}`,
       `-n ${options.copies}`,
       `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
       `-o sides=${duplexOption}`,

@@ -57,7 +57,8 @@ const os_1 = require("os");
 const Document_orientation_1 = __importDefault(require("./Document_orientation"));
 const execAsync = (0, util_1.promisify)(child_process_1.exec);
 const QUEUE_NAME = process.env.QUEUE_NAME || "print_jobs";
-const PRINTER_NAME = "Main_block";
+const Color_printer = "Main_block";
+const BlackAndWhite_printer = "Black_And_White";
 // Optional: Placeholder for print status check
 function getPrintStatus(jobId, type) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -77,7 +78,7 @@ function printFile(filePath, options) {
                 : 'one-sided';
             console.log("Duplex option:", duplexOption);
             const flags = [
-                `-d ${PRINTER_NAME}`,
+                `-d ${options.colorMode === 'color' ? Color_printer : BlackAndWhite_printer}`,
                 `-n ${options.copies}`,
                 `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
                 `-o sides=${duplexOption}`,
