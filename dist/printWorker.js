@@ -80,6 +80,7 @@ function printFile(filePath, options) {
             const flags = [
                 `-d ${options.colorMode === 'color' ? Color_printer : BlackAndWhite_printer}`,
                 `-n ${options.copies}`,
+                `-o Collate=True`,
                 `-o ColorModel=${options.colorMode === 'color' ? 'RGB' : 'Gray'}`,
                 `-o sides=${duplexOption}`,
                 options.pageRange ? `-P ${options.pageRange}` : '',
