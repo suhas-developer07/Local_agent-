@@ -42,12 +42,17 @@ async function getPrintStatus(jobId: string): Promise<string> {
 export async function printFile(filePath: string, options: PrintOptions): Promise<string> {
   const orientation = await getPDFOrientation(filePath);
 
-  const duplexOption =
+  let duplexOption =
     options.duplex === "double"
       ? orientation === "landscape"
         ? "two-sided-short-edge"
-        : "two-sided-long-edge"
+        : options.paperSize === "2" ? "two-sided-short-edge":"two-sided-long-edge"
       : "one-sided";
+
+      if(options.pageRange === "2"){
+        duplexOption = "two-sided-short-edge" 
+      }
+      console.log(duplexOption);
 
   const flags = [
     `-d ${options.colorMode === "color" ? COLOR_PRINTER : BW_PRINTER}`,

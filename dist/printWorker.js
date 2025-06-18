@@ -77,11 +77,15 @@ function getPrintStatus(jobId) {
 function printFile(filePath, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const orientation = yield (0, Document_orientation_1.default)(filePath);
-        const duplexOption = options.duplex === "double"
+        let duplexOption = options.duplex === "double"
             ? orientation === "landscape"
                 ? "two-sided-short-edge"
-                : "two-sided-long-edge"
+                : options.paperSize === "2" ? "two-sided-short-edge" : "two-sided-long-edge"
             : "one-sided";
+        if (options.pageRange === "2") {
+            duplexOption = "two-sided-short-edge";
+        }
+        console.log(duplexOption);
         const flags = [
             `-d ${options.colorMode === "color" ? COLOR_PRINTER : BW_PRINTER}`,
             `-n ${options.copies}`,
