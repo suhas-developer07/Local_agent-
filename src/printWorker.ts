@@ -27,7 +27,7 @@ interface PrintJob {
   options: PrintOptions;
 }
 
-// ✅ Check status using `lpstat`
+//  Check status using `lpstat`
 async function getPrintStatus(jobId: string): Promise<string> {
   try {
     const { stdout } = await execAsync("lpstat -W not-completed");
@@ -38,7 +38,7 @@ async function getPrintStatus(jobId: string): Promise<string> {
   }
 }
 
-// ✅ Print file with options and monitor job
+//  Print file with options and monitor job
 export async function printFile(filePath: string, options: PrintOptions): Promise<string> {
   const orientation = await getPDFOrientation(filePath);
 
@@ -105,7 +105,7 @@ export async function printFile(filePath: string, options: PrintOptions): Promis
   });
 }
 
-// ✅ Worker loop
+//  Worker loop
 export async function startWorker() {
   console.log("🚀 Print agent started. Waiting for jobs...");
 
